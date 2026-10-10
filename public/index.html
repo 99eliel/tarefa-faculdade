@@ -60,6 +60,7 @@ body{background:#f8fafd;color:#202124}
 <section id="reportsPage" class="hidden"><div class="intro"><div><h1>Relatórios</h1><p>Consulte e exporte os valores dos contêineres.</p></div><div style="display:flex;gap:8px"><button id="printButton" class="btn">Imprimir</button><button id="exportButton" class="btn primary">Exportar CSV</button></div></div><div class="stat-grid"><div class="stat"><div class="label">Custo mensal cadastrado</div><strong id="reportCost">R$ 0,00</strong></div><div class="stat"><div class="label">Projeção anual (12 × mensal)</div><strong id="reportYear">R$ 0,00</strong></div><div class="stat"><div class="label">Contêineres cadastrados</div><strong id="reportTotal">0</strong></div><div class="stat"><div class="label">PDFs anexados</div><strong id="reportPdf">0</strong></div></div><div class="panel" style="margin-top:20px"><h2>Detalhamento de custos</h2><div id="reportTable"></div><h2 style="margin-top:25px">Composição dos serviços e recursos</h2><div id="reportDetails"></div><p class="small muted">Os valores são informados pelo administrador. Não representam cobrança processada pelo Google Cloud nem preços individuais de CPU, memória ou disco.</p></div></section>
 <footer class="footer">CloudBilling Manager</footer></main></div></section>
 <div id="modalOverlay" class="overlay hidden"><form id="containerForm" class="modal"><div class="modal-top"><h2 id="modalTitle">Novo contêiner</h2><button type="button" class="btn" id="closeModal" aria-label="Fechar">✕</button></div><div class="formgrid"><label class="field span2">Nome do contêiner<input name="name" maxlength="80" required placeholder="Ex.: API de Clientes"></label><label class="field">Imagem / tecnologia<input name="image" maxlength="100" placeholder="Ex.: node:22-alpine"></label><label class="field">Status<select name="status"><option value="active">Ativo</option><option value="paused">Pausado</option></select></label><label class="field">CPU (vCPU)<input name="cpu" type="number" min="0.1" max="128" step="0.1" value="1" required></label><label class="field">Memória RAM (GB)<input name="ram" type="number" min="0.1" max="1024" step="0.1" value="2" required></label><label class="field">Armazenamento (GB)<input name="disk" type="number" min="0" max="100000" step="0.1" value="10" required></label><div class="span2 cost-editor"><strong>Composição do custo mensal</strong><p class="small muted">Informe o custo mensal de cada componente.</p><div class="formgrid"><label class="field">CPU (R$)<input name="cpuCost" type="number" min="0" max="100000000" step="0.01" value="0" required></label><label class="field">Memória RAM (R$)<input name="ramCost" type="number" min="0" max="100000000" step="0.01" value="0" required></label><label class="field">Armazenamento (R$)<input name="diskCost" type="number" min="0" max="100000000" step="0.01" value="0" required></label><label class="field">Serviços extras (R$)<input name="extraCost" type="number" min="0" max="100000000" step="0.01" value="0" required></label></div><label class="field">Total mensal calculado (R$)<input name="price" type="number" readonly value="0"></label><p id="legacyCostHint" class="small muted hidden">Cadastro anterior: o valor total foi atribuído a serviços extras. Distribua entre recursos, se desejar.</p></div><label class="field span2">Descrição e finalidade<textarea name="description" rows="3" maxlength="2000" placeholder="Descreva a finalidade do contêiner..."></textarea></label><label class="field span2">Serviços e funcionalidades incluídos<textarea name="services" rows="4" maxlength="3000" placeholder="Uma função por linha. Ex.: Hospedagem da aplicação&#10;API de clientes&#10;Processamento de solicitações"></textarea></label><label class="field span2">Documentação PDF (até 10 MB)<input id="pdfInput" type="file" accept="application/pdf,.pdf"><span id="currentPdf" class="muted small"></span></label></div><p class="err" id="formError" role="alert"></p><div class="modal-footer"><button type="button" id="cancelModal" class="btn">Cancelar</button><button id="saveButton" class="btn primary" type="submit">Salvar contêiner</button></div></form></div><div id="toast" class="toast hidden" role="status"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signOut} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
@@ -146,7 +147,7 @@ function toast(message,error=false){const el=$('toast');el.textContent=message;e
 function showApp(yes){$('loginScreen').classList.toggle('hidden',yes);$('appScreen').classList.toggle('hidden',!yes)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 function page(name){for(const n of ['dashboard','containers','reports'])$(n+'Page').classList.toggle('hidden',n!==name);document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name))}
-const table=(list,withActions=true)=>list.length?'<div class="tablewrap"><table class="data-table"><thead><tr><th>Contêiner</th><th>Recursos</th><th>Valor mensal</th><th>Status</th><th>PDF</th>'+(withActions?'<th>Ações</th>':'')+'</tr></thead><tbody>'+list.map(c=>'<tr><td><strong>'+safe(c.name)+'</strong><div class="muted small">'+safe(c.image||'Sem imagem informada')+'</div></td><td>'+safe(c.cpu)+' CPU · '+safe(c.ram)+' GB RAM</td><td><strong>'+money(c.price)+'</strong></td><td><span class="pill '+(c.status==='active'?'active':'paused')+'">'+(c.status==='active'?'Ativo':'Pausado')+'</span></td><td>'+(c.pdfPath?'📄 Disponível':'—')+'</td>'+(withActions?'<td><div class="actions"><button class="btn" data-action="edit" data-id="'+safe(c.id)+'">Editar</button>'+(c.pdfPath?'<button class="btn" data-action="pdf" data-id="'+safe(c.id)+'">PDF</button>':'')+'<button class="btn danger" data-action="delete" data-id="'+safe(c.id)+'">Excluir</button></div></td>':'')+'</tr>').join('')+'</tbody></table></div>':'<div class="empty">Nenhum contêiner encontrado. Clique em “Novo contêiner” para começar.</div>';
+const table=(list,withActions=true)=>list.length?'<div class="tablewrap"><table class="data-table"><thead><tr><th>Contêiner</th><th>Recursos</th><th>Valor mensal</th><th>Status</th><th>PDF</th>'+(withActions?'<th>Ações</th>':'')+'</tr></thead><tbody>'+list.map(c=>'<tr><td><strong>'+safe(c.name)+'</strong><div class="muted small">'+safe(c.image||'Sem imagem informada')+'</div></td><td>'+safe(c.cpu)+' CPU · '+safe(c.ram)+' GB RAM</td><td><strong>'+money(c.price)+'</strong></td><td><span class="pill '+(c.status==='active'?'active':'paused')+'">'+(c.status==='active'?'Ativo':'Pausado')+'</span></td><td>'+(c.pdfPath?'📄 Disponível':'—')+'</td>'+(withActions?'<td><div class="actions"><button class="btn" data-action="edit" data-id="'+safe(c.id)+'">Editar</button>'+(c.pdfPath?'<button class="btn" data-action="pdf" data-id="'+safe(c.id)+'">PDF</button>':'')+'<button class="btn" data-action="report" data-id="'+safe(c.id)+'">Gerar PDF</button><button class="btn danger" data-action="delete" data-id="'+safe(c.id)+'">Excluir</button></div></td>':'')+'</tr>').join('')+'</tbody></table></div>':'<div class="empty">Nenhum contêiner encontrado. Clique em “Novo contêiner” para começar.</div>';
 function render(){const total=items.reduce((s,c)=>s+(Number(c.price)||0),0),active=items.filter(c=>c.status==='active').length,pdf=items.filter(c=>!!c.pdfPath).length;
 $('statTotal').textContent=items.length;$('statActive').textContent=active;$('statCost').textContent=money(total);$('statPdf').textContent=pdf;
 $('sumCpu').textContent=items.reduce((s,c)=>s+(Number(c.cpu)||0),0).toLocaleString('pt-BR')+' vCPU';$('sumRam').textContent=items.reduce((s,c)=>s+(Number(c.ram)||0),0).toLocaleString('pt-BR')+' GB';$('statStorage').textContent=items.reduce((sum,c)=>sum+(Number(c.disk)||0),0).toLocaleString('pt-BR')+' GB';$('sumDisk').textContent=items.reduce((s,c)=>s+(Number(c.disk)||0),0).toLocaleString('pt-BR')+' GB';$('sumPaused').textContent=items.length-active;
@@ -290,7 +291,58 @@ $('containerForm').addEventListener('submit',async e=>{
     if(operationSession===session)$('formError').textContent=fieldsSaved?prefix:prefix+userMessage(err,'Tente novamente em instantes.');
   }finally{uploading=false;$('saveButton').disabled=false}
 });
-$('containerTable').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const c=items.find(x=>x.id===b.dataset.id);if(!c)return;try{if(b.dataset.action==='edit')openModal(c);if(b.dataset.action==='pdf'){const url=await getDownloadURL(ref(storage,c.pdfPath));window.open(url,'_blank','noopener,noreferrer');toast('PDF aberto em uma nova aba.')}if(b.dataset.action==='delete'&&confirm('Excluir o contêiner "'+c.name+'" e seu PDF?')){await deleteDoc(doc(db,'containers',c.id));if(c.pdfPath){try{await deleteObject(ref(storage,c.pdfPath))}catch(err){reportError('delete-pdf',err)}}toast('Contêiner excluído.')}}catch(err){reportError('container-action',err);toast(userMessage(err),true)}});
+
+function generateContainerReport(c){
+  if(!window.jspdf?.jsPDF){toast('Não foi possível carregar o gerador de PDF. Verifique sua conexão.',true);return}
+  const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,margin=19,usable=172;
+  let y=0;
+  const blue=[26,115,232],ink=[32,33,36],gray=[95,99,104],light=[244,247,252];
+  const txt=(value,x,yy,size=10,color=ink,style='normal')=>{pdf.setFont('helvetica',style);pdf.setFontSize(size);pdf.setTextColor(...color);pdf.text(String(value),x,yy)};
+  const line=(yy)=>{pdf.setDrawColor(224,227,231);pdf.line(margin,yy,W-margin,yy)};
+  const newPage=()=>{pdf.addPage();y=23;txt('CLOUDBILLING  /  RELATÓRIO DE CUSTOS',margin,13,9,blue,'bold');line(17)};
+  const ensure=(needed)=>{if(y+needed>275)newPage()};
+  const section=(heading)=>{ensure(19);y+=9;txt(heading,margin,y,12,ink,'bold');y+=6;line(y);y+=6};
+  const wrapped=(value,x,width,size=10,color=gray)=>{const lines=pdf.splitTextToSize(String(value||'Não informado'),width);for(const l of lines){ensure(6);txt(l,x,y,size,color);y+=5.5}};
+  const row=(label,value,highlight=false)=>{ensure(10);if(highlight){pdf.setFillColor(...light);pdf.roundedRect(margin,y-5,usable,11,2,2,'F')}txt(label,margin+3,y,10,highlight?ink:gray,highlight?'bold':'normal');txt(value,W-margin-3,y,10,highlight?blue:ink,'bold');y+=11};
+  pdf.setFillColor(...blue);pdf.rect(0,0,W,5,'F');
+  txt('CLOUDBILLING',margin,20,19,blue,'bold');
+  txt('RELATÓRIO INDIVIDUAL DE RECURSOS E CUSTOS',margin,29,9,gray,'bold');
+  pdf.setFillColor(...light);pdf.roundedRect(margin,38,usable,27,3,3,'F');
+  txt(c.name,margin+6,48,15,ink,'bold');
+  txt('Custo mensal cadastrado',margin+6,57,9,gray);
+  txt(money(c.price),W-margin-6,57,15,blue,'bold');
+  y=73;
+  txt('Emissão: '+new Date().toLocaleDateString('pt-BR'),margin,y,9,gray);
+  txt('Status: '+(c.status==='active'?'Ativo':'Pausado'),W-margin,y,9,gray);
+  section('Configuração técnica');
+  row('Imagem / tecnologia',c.image||'Não informada');
+  row('Processamento',c.cpu+' vCPU');
+  row('Memória RAM',c.ram+' GB');
+  row('Armazenamento',c.disk+' GB');
+  section('Composição do custo mensal');
+  if(['cpuCost','ramCost','diskCost','extraCost'].every(k=>typeof c[k]==='number')){
+    row('Processamento (CPU)',money(c.cpuCost));
+    row('Memória RAM',money(c.ramCost));
+    row('Armazenamento',money(c.diskCost));
+    row('Serviços adicionais',money(c.extraCost));
+  }else{
+    row('Valor mensal sem discriminação',money(c.price));
+  }
+  row('TOTAL MENSAL',money(c.price),true);
+  section('Finalidade do contêiner');
+  wrapped(c.description,margin,usable);
+  section('Serviços e funcionalidades incluídos');
+  const services=(c.services||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(!services.length)wrapped('Nenhuma funcionalidade detalhada no cadastro.',margin,usable);
+  for(const item of services){const lines=pdf.splitTextToSize(item,usable-8);ensure(lines.length*5.5+3);txt('•',margin+1,y,10,blue,'bold');for(const l of lines){txt(l,margin+7,y,10,ink);y+=5.5}y+=2}
+  if(c.pdfName){section('Documento técnico associado');wrapped(c.pdfName,margin,usable)}
+  const pages=pdf.getNumberOfPages();
+  for(let i=1;i<=pages;i++){pdf.setPage(i);pdf.setDrawColor(224,227,231);pdf.line(margin,285,W-margin,285);txt('CloudBilling Manager',margin,291,8,gray);txt('Página '+i+' de '+pages,W-margin,291,8,gray)}
+  const slug=String(c.name||'container').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-|-$/g,'').slice(0,55)||'container';
+  pdf.save('relatorio-'+slug+'.pdf');
+}
+
+$('containerTable').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const c=items.find(x=>x.id===b.dataset.id);if(!c)return;try{if(b.dataset.action==='edit')openModal(c);if(b.dataset.action==='report')generateContainerReport(c);if(b.dataset.action==='pdf'){const url=await getDownloadURL(ref(storage,c.pdfPath));window.open(url,'_blank','noopener,noreferrer');toast('PDF aberto em uma nova aba.')}if(b.dataset.action==='delete'&&confirm('Excluir o contêiner "'+c.name+'" e seu PDF?')){await deleteDoc(doc(db,'containers',c.id));if(c.pdfPath){try{await deleteObject(ref(storage,c.pdfPath))}catch(err){reportError('delete-pdf',err)}}toast('Contêiner excluído.')}}catch(err){reportError('container-action',err);toast(userMessage(err),true)}});
 $('exportButton').onclick=()=>{const rows=[['Nome','Imagem','Status','CPU','RAM GB','Disco GB','Valor mensal BRL','Custo CPU BRL','Custo RAM BRL','Custo disco BRL','Serviços extras BRL','Descrição','Serviços e funcionalidades','Documento PDF'],...items.map(c=>[c.name,c.image,c.status,c.cpu,c.ram,c.disk,c.price,c.cpuCost??'',c.ramCost??'',c.diskCost??'',c.extraCost??'',c.description,c.services||'',c.pdfName||''])];const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='cloudbilling-relatorio.csv';a.click();URL.revokeObjectURL(url)};
 $('printButton').onclick=()=>window.print();
 </script></body></html>
