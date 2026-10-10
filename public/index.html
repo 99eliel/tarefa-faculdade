@@ -52,6 +52,7 @@ body{background:#f8fafd;color:#202124}
 <aside class="sidebar"><div class="logo"><span class="logo-icon"><svg class="gc-symbol" viewBox="0 0 64 64" aria-hidden="true"><path fill="#4285f4" d="M43.8 18.2 51 11a28 28 0 0 1 7.5 37.4L49 43c4-7.4 2.4-17.3-5.2-24.8Z"/><path fill="#34a853" d="M25 51h26l-4-12H25l-6 6Z"/><path fill="#fbbc05" d="M17 43.5a14 14 0 0 1 3-17L13 18A25 25 0 0 0 16 53l9-2Z"/><path fill="#ea4335" d="M20 26.5C28 14 40 12 51 21l7-10C41-4 17 2 13 18Z"/><path fill="#fff" d="M23 45h22c14 0 14-19 0-19h-3c-3-13-22-11-25 2-12 1-11 17 6 17Z"/></svg></span> CloudBilling</div><nav class="nav"><button class="active" data-page="dashboard">◫ &nbsp; Visão geral</button><button data-page="containers">▣ &nbsp; Contêineres</button><button data-page="reports">▤ &nbsp; Relatórios</button></nav><div class="sidebar-foot"><div id="sidebarEmail"></div><p>Projeto acadêmico · V1.0</p><button class="btn full" id="logoutSide">Sair da conta</button></div></aside>
 <div class="main"><header class="topbar"><div><strong>CloudBilling Manager</strong><div class="muted small">Console de faturamento fictício</div></div><span class="tag">● Ambiente de simulação</span></header><nav class="mobile-nav"><button data-page="dashboard">Visão geral</button><button data-page="containers">Contêineres</button><button data-page="reports">Relatórios</button><button id="logoutMobile">Sair</button></nav>
 <main class="content">
+<p id="dataWarning" class="note hidden" role="alert"></p>
 <section id="dashboardPage"><div class="intro"><div><h1>Visão geral</h1><p>Acompanhe seus recursos e custos mensais simulados.</p></div><button class="btn primary new-btn">＋ Novo contêiner</button></div><div class="stat-grid"><div class="stat"><span class="symbol">▣</span><div class="label">Total de contêineres</div><strong id="statTotal">0</strong></div><div class="stat"><span class="symbol">◉</span><div class="label">Contêineres ativos</div><strong id="statActive">0</strong></div><div class="stat"><span class="symbol">＄</span><div class="label">Custo mensal cadastrado</div><strong id="statCost">R$ 0,00</strong></div><div class="stat"><span class="symbol">▤</span><div class="label">Com PDF anexado</div><strong id="statPdf">0</strong></div></div><div class="columns"><div class="panel"><h2>Projeção mensal de custos</h2><p class="small muted">Ilustração: custo cadastrado atualmente, repetido por 6 meses. Não representa pagamentos anteriores.</p><div id="chart" class="bars"></div></div><div class="panel"><h2>Resumo de recursos</h2><div class="summary-row"><span>CPU total cadastrada</span><strong id="sumCpu">0 vCPU</strong></div><div class="summary-row"><span>Memória total cadastrada</span><strong id="sumRam">0 GB</strong></div><div class="summary-row"><span>Armazenamento cadastrado</span><strong id="sumDisk">0 GB</strong></div><div class="summary-row"><span>Contêineres pausados</span><strong id="sumPaused">0</strong></div><p class="note">Valores e recursos representam cadastros didáticos, não uso real do Google Cloud.</p></div></div><div class="panel" style="margin-top:20px"><h2>Contêineres recentes</h2><div id="recentTable"></div></div></section>
 <section id="containersPage" class="hidden"><div class="intro"><div><h1>Contêineres</h1><p>Cadastre aplicações, recursos e documentação.</p></div><button class="btn primary new-btn">＋ Novo contêiner</button></div><div class="panel"><div class="toolbar"><input class="search" id="search" placeholder="Buscar por nome ou imagem..." aria-label="Buscar contêineres"><select id="filter" aria-label="Filtrar status"><option value="all">Todos os status</option><option value="active">Ativos</option><option value="paused">Pausados</option></select></div><div id="containerTable"></div></div></section>
 <section id="reportsPage" class="hidden"><div class="intro"><div><h1>Relatórios</h1><p>Consulte e exporte os valores dos contêineres.</p></div><div style="display:flex;gap:8px"><button id="printButton" class="btn">Imprimir</button><button id="exportButton" class="btn primary">Exportar CSV</button></div></div><div class="stat-grid"><div class="stat"><div class="label">Custo mensal cadastrado</div><strong id="reportCost">R$ 0,00</strong></div><div class="stat"><div class="label">Projeção anual (12 × mensal)</div><strong id="reportYear">R$ 0,00</strong></div><div class="stat"><div class="label">Contêineres cadastrados</div><strong id="reportTotal">0</strong></div><div class="stat"><div class="label">PDFs anexados</div><strong id="reportPdf">0</strong></div></div><div class="panel" style="margin-top:20px"><h2>Detalhamento do faturamento fictício</h2><div id="reportTable"></div><p class="note">Este relatório não é nota fiscal nem representa valores cobrados pelo Google.</p></div></section>
@@ -60,12 +61,46 @@ body{background:#f8fafd;color:#202124}
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signOut} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import {getFirestore,collection,doc,getDoc,addDoc,updateDoc,deleteDoc,onSnapshot,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {getFirestore,collection,doc,getDoc,getDocFromServer,addDoc,updateDoc,deleteDoc,onSnapshot,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 const firebaseConfig={apiKey:"AIzaSyDShBdXuIV7V2DOniYkVn_mlkf1HE5t2oY",authDomain:"cloudservicepayment.firebaseapp.com",projectId:"cloudservicepayment",storageBucket:"cloudservicepayment.firebasestorage.app",messagingSenderId:"682220384965",appId:"1:682220384965:web:d69f3ec14a2656efe776ac",measurementId:"G-MLX9BVMTGJ"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
 const $=id=>document.getElementById(id),money=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
 let items=[],unsubscribe=null,editingId=null,uploading=false,session=0;
+let pendingPdf=null;
+
+// Validate at the boundary without changing documents already stored in Firestore.
+function validateValues(values){
+  for(const [key,max,required] of [['name',80,true],['image',100,false],['description',2000,false]]){
+    if(typeof values[key]!=='string'||values[key].length>max||(required&&!values[key].trim()))return 'Revise nome, imagem e descrição.';
+  }
+  if(!['active','paused'].includes(values.status))return 'Selecione um status válido.';
+  for(const [key,min,max] of [['cpu',0.1,128],['ram',0.1,1024],['disk',0,100000],['price',0,100000000]]){
+    if(typeof values[key]!=='number'||!Number.isFinite(values[key])||values[key]<min||values[key]>max)return 'Revise os limites de CPU, RAM, armazenamento e valor mensal.';
+  }
+  return '';
+}
+function readContainer(snapshot){
+  const data=snapshot.data();
+  if(!data||typeof data!=='object')return null;
+  const result={id:snapshot.id};
+  for(const key of ['name','image','description'])result[key]=data[key]??'';
+  result.status=data.status;
+  for(const key of ['cpu','ram','disk','price']){
+    const value=data[key];
+    // Older records may contain numeric strings; never coerce maps or arrays.
+    result[key]=typeof value==='number'?value:typeof value==='string'&&value.trim()?Number(value):NaN;
+  }
+  if(validateValues(result))return null;
+  for(const key of ['pdfPath','pdfName']){
+    if(data[key]!=null&&typeof data[key]!=='string')return null;
+    result[key]=data[key]||'';
+  }
+  result.createdAt={seconds:typeof data.createdAt?.seconds==='number'&&Number.isFinite(data.createdAt.seconds)?data.createdAt.seconds:0};
+  return result;
+}
+function dataWarning(message){$('dataWarning').textContent=message;$('dataWarning').classList.toggle('hidden',!message)}
+
 function toast(message,error=false){const el=$('toast');el.textContent=message;el.classList.toggle('error',error);el.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),4500)}
 function showApp(yes){$('loginScreen').classList.toggle('hidden',yes);$('appScreen').classList.toggle('hidden',!yes)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -78,18 +113,87 @@ $('recentTable').innerHTML=table(items.slice(0,5),false);const query=$('search')
 $('reportCost').textContent=money(total);$('reportYear').textContent=money(total*12);$('reportTotal').textContent=items.length;$('reportPdf').textContent=pdf;$('reportTable').innerHTML=table(items,false);
 const now=new Date(),months=Array.from({length:6},(_,i)=>new Date(now.getFullYear(),now.getMonth()+i,1));$('chart').innerHTML=months.map(m=>'<div class="barcol"><span>'+money(total)+'</span><div class="bar" style="height:'+(total>0?'75':'2')+'%"></div><span>'+m.toLocaleDateString('pt-BR',{month:'short'})+'</span></div>').join('');
 }
-async function enter(user){const t=++session;try{const adm=await getDoc(doc(db,'admins',user.uid));if(t!==session)return;if(!adm.exists()){await signOut(auth);$('loginError').textContent='Este usuário não foi autorizado. Cadastre o UID dele em admins no Firestore.';return} $('sidebarEmail').textContent=user.email||'Administrador';showApp(true);unsubscribe=onSnapshot(collection(db,'containers'),snap=>{items=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));render()},err=>toast('Erro ao carregar contêineres: '+err.message,true))}catch(e){$('loginError').textContent='Erro de acesso: '+e.message;toast('Não foi possível verificar permissões.',true)}}
-onAuthStateChanged(auth,user=>{if(unsubscribe){unsubscribe();unsubscribe=null}items=[];render();if(user)enter(user);else{session++;showApp(false)}});
+async function enter(user){const t=++session;try{const adm=await getDoc(doc(db,'admins',user.uid));if(t!==session)return;if(!adm.exists()){await signOut(auth);$('loginError').textContent='Este usuário não foi autorizado. Cadastre o UID dele em admins no Firestore.';return} $('sidebarEmail').textContent=user.email||'Administrador';showApp(true);unsubscribe=onSnapshot(collection(db,'containers'),snap=>{if(t!==session)return;const parsed=snap.docs.map(readContainer);const invalid=parsed.filter(c=>!c).length;items=parsed.filter(Boolean).sort((a,b)=>b.createdAt.seconds-a.createdAt.seconds);dataWarning(invalid?invalid+' cadastro(s) com dados inválidos foram omitidos. Os totais e relatórios incluem apenas cadastros válidos. Os documentos originais foram preservados.':'');render()},err=>{if(t!==session)return;items=[];render();dataWarning('Não foi possível carregar os cadastros. Os totais estão indisponíveis. Entre novamente para tentar recuperar a conexão.');toast('Erro ao carregar contêineres: '+err.message,true)})}catch(e){$('loginError').textContent='Erro de acesso: '+e.message;toast('Não foi possível verificar permissões.',true)}}
+onAuthStateChanged(auth,user=>{if(unsubscribe){unsubscribe();unsubscribe=null}session++;items=[];dataWarning('');render();showApp(false);$('modalOverlay').classList.add('hidden');editingId=null;pendingPdf=null;$('loginPassword').value='';if(user)enter(user)});
 $('googleLogin').addEventListener('click',async()=>{const button=$('googleLogin');button.disabled=true;$('loginError').textContent='';try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider)}catch(err){if(err.code!=='auth/popup-closed-by-user'){$('loginError').textContent=err.code==='auth/operation-not-allowed'?'Ative o provedor Google em Firebase Authentication.':err.code==='auth/unauthorized-domain'?'Adicione este domínio em Authentication > Settings > Authorized domains.':'Não foi possível entrar com Google: '+err.message}}finally{button.disabled=false}});
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';$('loginButton').disabled=true;try{await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value)}catch(err){$('loginError').textContent='Falha no login. Verifique as credenciais e o Authentication habilitado.'}finally{$('loginButton').disabled=false}});
-async function logout(){await signOut(auth)}$('logoutSide').onclick=logout;$('logoutMobile').onclick=logout;
+async function logout(){if(uploading){toast('Aguarde o salvamento antes de sair.',true);return}try{await signOut(auth)}catch(err){toast('Não foi possível sair: '+err.message,true)}}$('logoutSide').onclick=logout;$('logoutMobile').onclick=logout;
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
-function closeModal(){if(uploading)return;$('modalOverlay').classList.add('hidden');editingId=null}
-function openModal(c=null){editingId=c?.id||null;$('containerForm').reset();$('formError').textContent='';$('modalTitle').textContent=c?'Editar contêiner':'Novo contêiner';$('currentPdf').textContent=c?.pdfName?'PDF atual: '+c.pdfName:'';for(const key of ['name','image','status','cpu','ram','disk','price','description'])if(c&&c[key]!==undefined)$('containerForm').elements.namedItem(key).value=c[key];$('modalOverlay').classList.remove('hidden')}
+async function closeModal(){
+  if(uploading)return;
+  if(pendingPdf){
+    if(!confirm('Os dados já foram salvos. Fechar sem concluir o vínculo do PDF?'))return;
+    uploading=true;$('saveButton').disabled=true;
+    try{
+      // A server read prevents deleting a PDF whose metadata write actually succeeded.
+      const record=await getDocFromServer(doc(db,'containers',editingId));
+      if(!record.exists()||record.data().pdfPath!==pendingPdf.path){
+        try{await deleteObject(ref(storage,pendingPdf.path))}
+        catch(err){if(err.code!=='storage/object-not-found')throw err}
+      }
+      pendingPdf=null;
+    }catch(err){$('formError').textContent='Não foi possível verificar o PDF. Tente Salvar ou Cancelar novamente quando a conexão voltar. '+err.message;return}
+    finally{uploading=false;$('saveButton').disabled=false}
+  }
+  $('modalOverlay').classList.add('hidden');editingId=null;
+}
+function openModal(c=null){if(uploading)return;pendingPdf=null;$('pdfInput').disabled=false;editingId=c?.id||null;$('containerForm').reset();$('formError').textContent='';$('modalTitle').textContent=c?'Editar contêiner':'Novo contêiner';$('currentPdf').textContent=c?.pdfName?'PDF atual: '+c.pdfName:'';for(const key of ['name','image','status','cpu','ram','disk','price','description'])if(c&&c[key]!==undefined)$('containerForm').elements.namedItem(key).value=c[key];$('modalOverlay').classList.remove('hidden')}
 document.querySelectorAll('.new-btn').forEach(b=>b.onclick=()=>openModal());$('closeModal').onclick=closeModal;$('cancelModal').onclick=closeModal;$('search').oninput=render;$('filter').onchange=render;
-$('containerForm').addEventListener('submit',async e=>{e.preventDefault();if(uploading)return;const f=e.currentTarget,file=$('pdfInput').files[0],current=items.find(c=>c.id===editingId);if(file&&(file.type!=='application/pdf'||file.size>10*1024*1024||file.size===0)){$('formError').textContent='Selecione um PDF válido de até 10 MB.';return}const values={name:f.elements.namedItem('name').value.trim(),image:f.elements.namedItem('image').value.trim(),status:f.elements.namedItem('status').value,description:f.elements.namedItem('description').value.trim(),cpu:Number(f.elements.namedItem('cpu').value),ram:Number(f.elements.namedItem('ram').value),disk:Number(f.elements.namedItem('disk').value),price:Number(f.elements.namedItem('price').value)};if(!values.name||![values.cpu,values.ram,values.disk,values.price].every(Number.isFinite)||values.cpu<=0||values.ram<=0||values.disk<0||values.price<0){$('formError').textContent='Revise os dados e os valores informados.';return}
-uploading=true;$('saveButton').disabled=true;$('formError').textContent='';let id=editingId,created=false,uploadedPath=null;try{if(!id){const record=await addDoc(collection(db,'containers'),{...values,createdAt:serverTimestamp(),createdBy:auth.currentUser.uid,pdfPath:'',pdfName:''});id=record.id;created=true}else await updateDoc(doc(db,'containers',id),{...values,updatedAt:serverTimestamp()});
-if(file){uploadedPath='container-pdfs/'+id+'/'+crypto.randomUUID()+'.pdf';await uploadBytes(ref(storage,uploadedPath),file,{contentType:'application/pdf'});await updateDoc(doc(db,'containers',id),{pdfPath:uploadedPath,pdfName:file.name,updatedAt:serverTimestamp()});if(current?.pdfPath){try{await deleteObject(ref(storage,current.pdfPath))}catch(e){console.warn('PDF anterior não pôde ser removido',e)}}}uploading=false;closeModal();toast(created?'Contêiner criado com sucesso!':'Contêiner atualizado!')}catch(err){if(uploadedPath){try{await deleteObject(ref(storage,uploadedPath))}catch(_){}}$('formError').textContent='Falha ao salvar: '+err.message}finally{uploading=false;$('saveButton').disabled=false}});
+
+$('containerForm').addEventListener('submit',async e=>{
+  e.preventDefault();if(uploading)return;
+  const f=e.currentTarget,file=$('pdfInput').files[0],current=items.find(c=>c.id===editingId);
+  if(!auth.currentUser){$('formError').textContent='Entre novamente para salvar.';return}
+  if(file&&(file.type!=='application/pdf'||file.size>10*1024*1024||file.size===0)){
+    $('formError').textContent='Selecione um PDF válido de até 10 MB.';return;
+  }
+  const values={};
+  for(const key of ['name','image','status','description'])values[key]=f.elements.namedItem(key).value.trim();
+  for(const key of ['cpu','ram','disk','price'])values[key]=Number(f.elements.namedItem(key).value);
+  const validationError=validateValues(values);
+  if(validationError){$('formError').textContent=validationError;return}
+  uploading=true;$('saveButton').disabled=true;$('formError').textContent='';
+  const operationSession=session;
+  let fieldsSaved=false,created=false,cleanupFailed=false;
+  let targetId=editingId;
+  try{
+    if(!targetId){
+      const record=await addDoc(collection(db,'containers'),{...values,createdAt:serverTimestamp(),createdBy:auth.currentUser.uid,pdfPath:'',pdfName:''});
+      // Keep the confirmed ID even if the following upload fails.
+      targetId=record.id;created=true;
+      if(operationSession!==session)throw new Error('A sessão mudou. Entre novamente e confira o cadastro salvo.');
+      editingId=targetId;
+      $('modalTitle').textContent='Editar contêiner';
+    }else await updateDoc(doc(db,'containers',targetId),{...values,updatedAt:serverTimestamp()});
+    fieldsSaved=true;
+    if(operationSession!==session)throw new Error('A sessão mudou. Entre novamente e confira o cadastro salvo.');
+    if(file||pendingPdf){
+      if(!pendingPdf){
+        const path='container-pdfs/'+targetId+'/'+crypto.randomUUID()+'.pdf';
+        await uploadBytes(ref(storage,path),file,{contentType:'application/pdf'});
+        if(operationSession!==session)throw new Error('A sessão mudou durante o envio. Confira o cadastro e o anexo antes de tentar novamente.');
+        pendingPdf={path,name:file.name,previousPath:current?.pdfPath||''};
+        $('pdfInput').disabled=true;
+      }
+      // A failed metadata write can be retried without uploading the PDF again.
+      const attachment=pendingPdf;
+      await updateDoc(doc(db,'containers',targetId),{pdfPath:attachment.path,pdfName:attachment.name,updatedAt:serverTimestamp()});
+      if(operationSession!==session)return;
+      pendingPdf=null;
+      if(attachment.previousPath&&attachment.previousPath!==attachment.path){
+        try{await deleteObject(ref(storage,attachment.previousPath))}
+        catch(err){if(err.code!=='storage/object-not-found'){cleanupFailed=true;console.warn('PDF anterior não pôde ser removido',err)}}
+      }
+    }
+    if(operationSession!==session)return;
+    uploading=false;await closeModal();
+    toast(cleanupFailed?'Cadastro salvo. O PDF anterior não pôde ser removido; é necessário revisar os anexos no Storage.':created?'Contêiner criado com sucesso!':'Contêiner atualizado!',cleanupFailed);
+  }catch(err){
+    // Never delete an uploaded file after an uncertain metadata-write result.
+    const prefix=fieldsSaved?'Os dados do contêiner foram salvos. O PDF não foi concluído. Clique em Salvar para tentar novamente no mesmo cadastro. ':'Não foi possível salvar os dados. ';
+    if(operationSession===session)$('formError').textContent=prefix+err.message;
+  }finally{uploading=false;$('saveButton').disabled=false}
+});
 $('containerTable').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const c=items.find(x=>x.id===b.dataset.id);if(!c)return;try{if(b.dataset.action==='edit')openModal(c);if(b.dataset.action==='pdf'){const url=await getDownloadURL(ref(storage,c.pdfPath));window.open(url,'_blank','noopener,noreferrer');toast('PDF aberto em uma nova aba.')}if(b.dataset.action==='delete'&&confirm('Excluir o contêiner "'+c.name+'" e seu PDF?')){await deleteDoc(doc(db,'containers',c.id));if(c.pdfPath){try{await deleteObject(ref(storage,c.pdfPath))}catch(err){console.warn('Falha na exclusão do PDF',err)}}toast('Contêiner excluído.')}}catch(err){toast('Operação não concluída: '+err.message,true)}});
 $('exportButton').onclick=()=>{const rows=[['Nome','Imagem','Status','CPU','RAM GB','Disco GB','Valor mensal BRL','Descrição','Documento PDF'],...items.map(c=>[c.name,c.image,c.status,c.cpu,c.ram,c.disk,c.price,c.description,c.pdfName||''])];const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='cloudbilling-relatorio.csv';a.click();URL.revokeObjectURL(url)};
 $('printButton').onclick=()=>window.print();
