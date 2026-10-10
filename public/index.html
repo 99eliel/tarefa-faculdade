@@ -159,7 +159,7 @@ async function enter(user){
     if(!adm.exists()){
       showApp(false);
       try{await signOut(auth)}catch(error){reportError('sign-out-after-access-denied',error)}
-      $('loginError').textContent='Sua conta ainda não tem acesso a este painel. Entre com uma conta autorizada.';
+      $('loginError').textContent='Conta autenticada, mas ainda não autorizada. No Firestore, crie a coleção admins e um documento com este UID: '+user.uid+'. Depois tente novamente.';
       return;
     }
     $('loginError').textContent='';$('sidebarEmail').textContent=user.email||'Administrador';showApp(true);
@@ -189,12 +189,12 @@ onAuthStateChanged(auth,user=>{
 });
 $('googleLogin').addEventListener('click',async()=>{
   setLoginBusy(true);$('loginError').textContent='';const attemptSession=session;
-  try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});const result=await signInWithPopup(auth,provider);if(attemptSession===session)await enter(result.user)}
+  try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider)}
   catch(error){reportError('google-login',error);$('loginError').textContent=userMessage(error,'Não foi possível entrar com Google. Tente novamente.');setLoginBusy(false)}
 });
 $('loginForm').addEventListener('submit',async event=>{
   event.preventDefault();setLoginBusy(true);$('loginError').textContent='';const attemptSession=session;
-  try{const result=await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value);if(attemptSession===session)await enter(result.user)}
+  try{await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value)}
   catch(error){reportError('email-login',error);$('loginError').textContent=userMessage(error,'Não foi possível entrar. Confira seus dados e tente novamente.');setLoginBusy(false)}
 });
 async function logout(){
