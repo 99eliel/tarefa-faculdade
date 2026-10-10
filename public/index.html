@@ -292,8 +292,29 @@ $('containerForm').addEventListener('submit',async e=>{
   }finally{uploading=false;$('saveButton').disabled=false}
 });
 
+function generatePrintableReport(c){
+ const win=window.open('','_blank');
+ if(!win){toast('Permita a abertura de pop-ups para gerar o relatório.',true);return}
+ const rows=[['CPU',c.cpuCost],['Memória RAM',c.ramCost],['Armazenamento',c.diskCost],['Serviços adicionais',c.extraCost]];
+ const hasCosts=rows.every(([,value])=>typeof value==='number');
+ const services=(c.services||'').split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+ const esc=safe;
+ const stamp=new Date().toLocaleDateString('pt-BR');
+ const details=hasCosts?rows.map(([title,value])=>'<tr><td>'+esc(title)+'</td><td class="right">'+money(value)+'</td></tr>').join(''):'<tr><td>Valor cadastrado sem discriminação</td><td class="right">'+money(c.price)+'</td></tr>';
+ const html='<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório - '+esc(c.name)+'</title><style>'+
+ '@page{size:A4;margin:16mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#202124;margin:0;background:#fff;font-size:11pt}header{border-top:6px solid #4285f4;padding:23px 0 16px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;color:#1a73e8;font-size:20pt}.date{font-size:9pt;color:#5f6368}.subtitle{color:#5f6368;letter-spacing:1.2px;font-size:9pt;margin-top:6px}h1{font-size:22pt;margin:15px 0 8px}h2{font-size:12pt;color:#202124;border-bottom:1px solid #e0e3e7;padding-bottom:9px;margin-top:27px}.card{background:#f5f8ff;border-radius:12px;padding:20px;margin:18px 0}.value{font-size:22pt;color:#1a73e8;font-weight:800;margin-top:10px}.chips{display:flex;gap:10px;flex-wrap:wrap}.chip{background:#f1f5fc;border-radius:7px;padding:12px 16px;min-width:110px}.chip b{display:block;margin-top:5px}table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #ebeff5;padding:12px 8px}.right{text-align:right;font-weight:700}.total td{background:#e8f0fe;color:#174ea6;font-size:13pt;font-weight:800}li{padding:5px 0;line-height:1.5}.description{line-height:1.65;white-space:pre-wrap}footer{margin-top:35px;border-top:1px solid #dce3ee;padding-top:10px;color:#8692a7;font-size:9pt}.actions{text-align:right;margin:10px 0 20px}.actions button{background:#1a73e8;border:0;border-radius:9px;color:#fff;padding:12px 20px;font-size:12pt;cursor:pointer}@media print{.actions{display:none}section,table,tr{break-inside:avoid}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'+
+ '</style></head><body><div class="actions"><button onclick="window.print()">Salvar como PDF / Imprimir</button></div><header><div><div class="brand">CloudBilling</div><div class="subtitle">RELATÓRIO INDIVIDUAL DE CUSTOS</div></div><div class="date">Emissão: '+esc(stamp)+'</div></header>'+
+ '<div class="card"><div>CONTÊINER</div><h1>'+esc(c.name)+'</h1><div class="date">'+esc(c.image||'Tecnologia não informada')+' · '+(c.status==='active'?'Ativo':'Pausado')+'</div><div class="value">'+money(c.price)+' / mês</div></div>'+
+ '<h2>Configuração técnica</h2><div class="chips"><div class="chip">Processamento<b>'+esc(c.cpu)+' vCPU</b></div><div class="chip">Memória RAM<b>'+esc(c.ram)+' GB</b></div><div class="chip">Armazenamento<b>'+esc(c.disk)+' GB</b></div></div>'+
+ '<h2>Distribuição do valor mensal</h2><table>'+details+'<tr class="total"><td>Total mensal</td><td class="right">'+money(c.price)+'</td></tr></table>'+
+ '<h2>Finalidade</h2><div class="description">'+esc(c.description||'Não informada')+'</div>'+
+ '<h2>Serviços e funcionalidades</h2>'+(services.length?'<ul>'+services.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul>':'<p>Não informados.</p>')+
+ (c.pdfName?'<h2>Documentação relacionada</h2><p>'+esc(c.pdfName)+'</p>':'')+
+ '<footer>CloudBilling Manager · Relatório de recursos e custos</footer></body></html>';
+ win.document.open();win.document.write(html);win.document.close();win.focus();
+}
 function generateContainerReport(c){
-  if(!window.jspdf?.jsPDF){toast('Não foi possível carregar o gerador de PDF. Verifique sua conexão.',true);return}
+  if(!window.jspdf?.jsPDF){return generatePrintableReport(c)}
   const pdf=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),W=210,margin=19,usable=172;
   let y=0;
   const blue=[26,115,232],ink=[32,33,36],gray=[95,99,104],light=[244,247,252];
