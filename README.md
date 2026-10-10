@@ -56,3 +56,13 @@ Os testes executam o JavaScript da página com DOM e serviços Firebase simulado
 
 `public/index.html` é a fonte da interface. Ao editar, copie seu conteúdo para `index.html` antes de publicar no GitHub Pages; o teste detecta divergências.
 
+## Acesso administrativo e mensagens
+
+Autenticação e autorização são etapas distintas. O login Google confirma a identidade; o acesso ao painel exige um documento `admins/{uid}`. O UID deve ser copiado do usuário correspondente em **Authentication > Users**. Criar esse documento é uma operação administrativa no console do projeto, não um cadastro público no site. Não libere escrita pública em `admins` nem remova essa verificação para contornar um erro de acesso.
+
+O painel consulta a autorização no servidor e permite repetir a verificação após uma falha de conexão, inclusive quando a conta já está autenticada. Enquanto verifica o acesso, os dois botões de login permanecem desabilitados.
+
+A interface usa mensagens orientadas ao usuário para credenciais inválidas, bloqueio de popup, conexão e conta sem acesso. Códigos técnicos ficam no console do navegador; instruções de configuração permanecem nesta documentação. O caráter acadêmico continua indicado pelo selo de ambiente de simulação, sem repetir avisos em todas as seções.
+
+Não confunda acesso ao console Firebase com acesso ao aplicativo: a conta que administra o projeto precisa de permissão no projeto Google Cloud; a conta que usa o CloudBilling precisa estar em `admins`. Uma conta pode ter apenas um desses acessos.
+

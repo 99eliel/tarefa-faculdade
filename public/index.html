@@ -45,23 +45,25 @@ body{background:#f8fafd;color:#202124}
 .gc-brand strong{font-size:19px;letter-spacing:-.6px;color:#5f6368}
 .gc-brand .google-letter{color:#4285f4}
 @media(max-width:720px){.mobile-nav{background:#fff;border-bottom:1px solid #e0e3e7}.mobile-nav button{background:#e8f0fe;color:#1a73e8}}
+
+#loginError:empty{display:none}#loginError:not(:empty){margin:12px 0;line-height:1.5}#loginButton{margin-top:4px}
 </style></head>
 <body><div class="cloud-stripe" aria-hidden="true"></div>
-<section id="loginScreen" class="screen auth"><form id="loginForm" class="auth-card"><div class="logo"><span class="logo-icon"><svg class="gc-symbol" viewBox="0 0 64 64" aria-hidden="true"><path fill="#4285f4" d="M43.8 18.2 51 11a28 28 0 0 1 7.5 37.4L49 43c4-7.4 2.4-17.3-5.2-24.8Z"/><path fill="#34a853" d="M25 51h26l-4-12H25l-6 6Z"/><path fill="#fbbc05" d="M17 43.5a14 14 0 0 1 3-17L13 18A25 25 0 0 0 16 53l9-2Z"/><path fill="#ea4335" d="M20 26.5C28 14 40 12 51 21l7-10C41-4 17 2 13 18Z"/><path fill="#fff" d="M23 45h22c14 0 14-19 0-19h-3c-3-13-22-11-25 2-12 1-11 17 6 17Z"/></svg></span> CloudBilling</div><h1>Bem-vindo de volta</h1><p class="muted">Faça login para gerenciar contêineres e faturamento simulado.</p><label class="field">E-mail<input id="loginEmail" type="email" placeholder="admin@exemplo.com" required autocomplete="username"></label><label class="field">Senha<input id="loginPassword" type="password" placeholder="Sua senha" required autocomplete="current-password"></label><div class="err" id="loginError" role="alert"></div><button class="btn primary full" id="loginButton" type="submit">Entrar no painel</button><div style="display:flex;align-items:center;gap:12px;margin:19px 0;color:#91a0b8;font-size:12px"><span style="flex:1;height:1px;background:#e1e6f1"></span>ou<span style="flex:1;height:1px;background:#e1e6f1"></span></div><button type="button" class="btn full" id="googleLogin" style="display:flex;justify-content:center;align-items:center;gap:12px"><svg width="19" height="19" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.7-.4-4H24v7.6h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-14.9Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.6l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.5H5.8V33c3.4 6.6 10.2 11 18.2 11Z"/><path fill="#FBBC05" d="M12.6 27.8a12 12 0 0 1 0-7.6V15H5.8a20 20 0 0 0 0 18l6.8-5.2Z"/><path fill="#EA4335" d="M24 12c3 0 5.6 1 7.7 3l5.8-5.7C34.1 6 29.5 4 24 4 16 4 9.2 8.4 5.8 15l6.8 5.2C14.2 15.6 18.7 12 24 12Z"/></svg>Continuar com Google</button><p class="small muted">Acesso restrito a administradores cadastrados no Firebase.</p></form></section>
+<section id="loginScreen" class="screen auth"><form id="loginForm" class="auth-card"><div class="logo"><span class="logo-icon"><svg class="gc-symbol" viewBox="0 0 64 64" aria-hidden="true"><path fill="#4285f4" d="M43.8 18.2 51 11a28 28 0 0 1 7.5 37.4L49 43c4-7.4 2.4-17.3-5.2-24.8Z"/><path fill="#34a853" d="M25 51h26l-4-12H25l-6 6Z"/><path fill="#fbbc05" d="M17 43.5a14 14 0 0 1 3-17L13 18A25 25 0 0 0 16 53l9-2Z"/><path fill="#ea4335" d="M20 26.5C28 14 40 12 51 21l7-10C41-4 17 2 13 18Z"/><path fill="#fff" d="M23 45h22c14 0 14-19 0-19h-3c-3-13-22-11-25 2-12 1-11 17 6 17Z"/></svg></span> CloudBilling</div><h1>Bem-vindo de volta</h1><p class="muted">Acesse seu painel de recursos e custos.</p><label class="field">E-mail<input id="loginEmail" type="email" placeholder="Seu e-mail" required autocomplete="username"></label><label class="field">Senha<input id="loginPassword" type="password" placeholder="Sua senha" required autocomplete="current-password"></label><div class="err" id="loginError" role="alert"></div><button class="btn primary full" id="loginButton" type="submit">Entrar no painel</button><div style="display:flex;align-items:center;gap:12px;margin:19px 0;color:#91a0b8;font-size:12px"><span style="flex:1;height:1px;background:#e1e6f1"></span>ou<span style="flex:1;height:1px;background:#e1e6f1"></span></div><button type="button" class="btn full" id="googleLogin" style="display:flex;justify-content:center;align-items:center;gap:12px"><svg width="19" height="19" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.7-.4-4H24v7.6h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.6c3.9-3.6 6.1-8.8 6.1-14.9Z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.6l-6.6-5.1c-1.8 1.2-4.1 2-6.9 2-5.3 0-9.8-3.6-11.4-8.5H5.8V33c3.4 6.6 10.2 11 18.2 11Z"/><path fill="#FBBC05" d="M12.6 27.8a12 12 0 0 1 0-7.6V15H5.8a20 20 0 0 0 0 18l6.8-5.2Z"/><path fill="#EA4335" d="M24 12c3 0 5.6 1 7.7 3l5.8-5.7C34.1 6 29.5 4 24 4 16 4 9.2 8.4 5.8 15l6.8 5.2C14.2 15.6 18.7 12 24 12Z"/></svg>Continuar com Google</button></form></section>
 <section id="appScreen" class="shell hidden">
-<aside class="sidebar"><div class="logo"><span class="logo-icon"><svg class="gc-symbol" viewBox="0 0 64 64" aria-hidden="true"><path fill="#4285f4" d="M43.8 18.2 51 11a28 28 0 0 1 7.5 37.4L49 43c4-7.4 2.4-17.3-5.2-24.8Z"/><path fill="#34a853" d="M25 51h26l-4-12H25l-6 6Z"/><path fill="#fbbc05" d="M17 43.5a14 14 0 0 1 3-17L13 18A25 25 0 0 0 16 53l9-2Z"/><path fill="#ea4335" d="M20 26.5C28 14 40 12 51 21l7-10C41-4 17 2 13 18Z"/><path fill="#fff" d="M23 45h22c14 0 14-19 0-19h-3c-3-13-22-11-25 2-12 1-11 17 6 17Z"/></svg></span> CloudBilling</div><nav class="nav"><button class="active" data-page="dashboard">◫ &nbsp; Visão geral</button><button data-page="containers">▣ &nbsp; Contêineres</button><button data-page="reports">▤ &nbsp; Relatórios</button></nav><div class="sidebar-foot"><div id="sidebarEmail"></div><p>Projeto acadêmico · V1.0</p><button class="btn full" id="logoutSide">Sair da conta</button></div></aside>
-<div class="main"><header class="topbar"><div><strong>CloudBilling Manager</strong><div class="muted small">Console de faturamento fictício</div></div><span class="tag">● Ambiente de simulação</span></header><nav class="mobile-nav"><button data-page="dashboard">Visão geral</button><button data-page="containers">Contêineres</button><button data-page="reports">Relatórios</button><button id="logoutMobile">Sair</button></nav>
+<aside class="sidebar"><div class="logo"><span class="logo-icon"><svg class="gc-symbol" viewBox="0 0 64 64" aria-hidden="true"><path fill="#4285f4" d="M43.8 18.2 51 11a28 28 0 0 1 7.5 37.4L49 43c4-7.4 2.4-17.3-5.2-24.8Z"/><path fill="#34a853" d="M25 51h26l-4-12H25l-6 6Z"/><path fill="#fbbc05" d="M17 43.5a14 14 0 0 1 3-17L13 18A25 25 0 0 0 16 53l9-2Z"/><path fill="#ea4335" d="M20 26.5C28 14 40 12 51 21l7-10C41-4 17 2 13 18Z"/><path fill="#fff" d="M23 45h22c14 0 14-19 0-19h-3c-3-13-22-11-25 2-12 1-11 17 6 17Z"/></svg></span> CloudBilling</div><nav class="nav"><button class="active" data-page="dashboard">◫ &nbsp; Visão geral</button><button data-page="containers">▣ &nbsp; Contêineres</button><button data-page="reports">▤ &nbsp; Relatórios</button></nav><div class="sidebar-foot"><div id="sidebarEmail"></div><p>CloudBilling Manager · v1.0</p><button class="btn full" id="logoutSide">Sair da conta</button></div></aside>
+<div class="main"><header class="topbar"><div><strong>CloudBilling Manager</strong><div class="muted small">Gerenciamento de recursos</div></div><span class="tag">● Ambiente de simulação</span></header><nav class="mobile-nav"><button data-page="dashboard">Visão geral</button><button data-page="containers">Contêineres</button><button data-page="reports">Relatórios</button><button id="logoutMobile">Sair</button></nav>
 <main class="content">
 <p id="dataWarning" class="note hidden" role="alert"></p>
-<section id="dashboardPage"><div class="intro"><div><h1>Visão geral</h1><p>Acompanhe seus recursos e custos mensais simulados.</p></div><button class="btn primary new-btn">＋ Novo contêiner</button></div><div class="stat-grid"><div class="stat"><span class="symbol">▣</span><div class="label">Total de contêineres</div><strong id="statTotal">0</strong></div><div class="stat"><span class="symbol">◉</span><div class="label">Contêineres ativos</div><strong id="statActive">0</strong></div><div class="stat"><span class="symbol">＄</span><div class="label">Custo mensal cadastrado</div><strong id="statCost">R$ 0,00</strong></div><div class="stat"><span class="symbol">▤</span><div class="label">Com PDF anexado</div><strong id="statPdf">0</strong></div></div><div class="columns"><div class="panel"><h2>Projeção mensal de custos</h2><p class="small muted">Ilustração: custo cadastrado atualmente, repetido por 6 meses. Não representa pagamentos anteriores.</p><div id="chart" class="bars"></div></div><div class="panel"><h2>Resumo de recursos</h2><div class="summary-row"><span>CPU total cadastrada</span><strong id="sumCpu">0 vCPU</strong></div><div class="summary-row"><span>Memória total cadastrada</span><strong id="sumRam">0 GB</strong></div><div class="summary-row"><span>Armazenamento cadastrado</span><strong id="sumDisk">0 GB</strong></div><div class="summary-row"><span>Contêineres pausados</span><strong id="sumPaused">0</strong></div><p class="note">Valores e recursos representam cadastros didáticos, não uso real do Google Cloud.</p></div></div><div class="panel" style="margin-top:20px"><h2>Contêineres recentes</h2><div id="recentTable"></div></div></section>
+<section id="dashboardPage"><div class="intro"><div><h1>Visão geral</h1><p>Acompanhe seus recursos e custos mensais.</p></div><button class="btn primary new-btn">＋ Novo contêiner</button></div><div class="stat-grid"><div class="stat"><span class="symbol">▣</span><div class="label">Total de contêineres</div><strong id="statTotal">0</strong></div><div class="stat"><span class="symbol">◉</span><div class="label">Contêineres ativos</div><strong id="statActive">0</strong></div><div class="stat"><span class="symbol">＄</span><div class="label">Custo mensal cadastrado</div><strong id="statCost">R$ 0,00</strong></div><div class="stat"><span class="symbol">▤</span><div class="label">Com PDF anexado</div><strong id="statPdf">0</strong></div></div><div class="columns"><div class="panel"><h2>Projeção mensal de custos</h2><p class="small muted">Estimativa para os próximos 6 meses, com base no custo mensal atual.</p><div id="chart" class="bars"></div></div><div class="panel"><h2>Resumo de recursos</h2><div class="summary-row"><span>CPU total cadastrada</span><strong id="sumCpu">0 vCPU</strong></div><div class="summary-row"><span>Memória total cadastrada</span><strong id="sumRam">0 GB</strong></div><div class="summary-row"><span>Armazenamento cadastrado</span><strong id="sumDisk">0 GB</strong></div><div class="summary-row"><span>Contêineres pausados</span><strong id="sumPaused">0</strong></div></div></div><div class="panel" style="margin-top:20px"><h2>Contêineres recentes</h2><div id="recentTable"></div></div></section>
 <section id="containersPage" class="hidden"><div class="intro"><div><h1>Contêineres</h1><p>Cadastre aplicações, recursos e documentação.</p></div><button class="btn primary new-btn">＋ Novo contêiner</button></div><div class="panel"><div class="toolbar"><input class="search" id="search" placeholder="Buscar por nome ou imagem..." aria-label="Buscar contêineres"><select id="filter" aria-label="Filtrar status"><option value="all">Todos os status</option><option value="active">Ativos</option><option value="paused">Pausados</option></select></div><div id="containerTable"></div></div></section>
-<section id="reportsPage" class="hidden"><div class="intro"><div><h1>Relatórios</h1><p>Consulte e exporte os valores dos contêineres.</p></div><div style="display:flex;gap:8px"><button id="printButton" class="btn">Imprimir</button><button id="exportButton" class="btn primary">Exportar CSV</button></div></div><div class="stat-grid"><div class="stat"><div class="label">Custo mensal cadastrado</div><strong id="reportCost">R$ 0,00</strong></div><div class="stat"><div class="label">Projeção anual (12 × mensal)</div><strong id="reportYear">R$ 0,00</strong></div><div class="stat"><div class="label">Contêineres cadastrados</div><strong id="reportTotal">0</strong></div><div class="stat"><div class="label">PDFs anexados</div><strong id="reportPdf">0</strong></div></div><div class="panel" style="margin-top:20px"><h2>Detalhamento do faturamento fictício</h2><div id="reportTable"></div><p class="note">Este relatório não é nota fiscal nem representa valores cobrados pelo Google.</p></div></section>
-<footer class="footer">CloudBilling Manager · Identidade visual inspirada no Google Cloud · Projeto acadêmico independente</footer></main></div></section>
-<div id="modalOverlay" class="overlay hidden"><form id="containerForm" class="modal"><div class="modal-top"><h2 id="modalTitle">Novo contêiner</h2><button type="button" class="btn" id="closeModal" aria-label="Fechar">✕</button></div><div class="formgrid"><label class="field span2">Nome do contêiner<input name="name" maxlength="80" required placeholder="Ex.: API de Clientes"></label><label class="field">Imagem / tecnologia<input name="image" maxlength="100" placeholder="Ex.: node:22-alpine"></label><label class="field">Status<select name="status"><option value="active">Ativo</option><option value="paused">Pausado</option></select></label><label class="field">CPU (vCPU)<input name="cpu" type="number" min="0.1" max="128" step="0.1" value="1" required></label><label class="field">Memória RAM (GB)<input name="ram" type="number" min="0.1" max="1024" step="0.1" value="2" required></label><label class="field">Armazenamento (GB)<input name="disk" type="number" min="0" max="100000" step="0.1" value="10" required></label><label class="field">Valor mensal fictício (R$)<input name="price" type="number" min="0" max="100000000" step="0.01" value="100" required></label><label class="field span2">Descrição e finalidade<textarea name="description" rows="3" maxlength="2000" placeholder="Explique o que esse contêiner executaria..."></textarea></label><label class="field span2">Documentação PDF (até 10 MB)<input id="pdfInput" type="file" accept="application/pdf,.pdf"><span id="currentPdf" class="muted small"></span></label></div><p class="err" id="formError" role="alert"></p><div class="modal-footer"><button type="button" id="cancelModal" class="btn">Cancelar</button><button id="saveButton" class="btn primary" type="submit">Salvar contêiner</button></div></form></div><div id="toast" class="toast hidden" role="status"></div>
+<section id="reportsPage" class="hidden"><div class="intro"><div><h1>Relatórios</h1><p>Consulte e exporte os valores dos contêineres.</p></div><div style="display:flex;gap:8px"><button id="printButton" class="btn">Imprimir</button><button id="exportButton" class="btn primary">Exportar CSV</button></div></div><div class="stat-grid"><div class="stat"><div class="label">Custo mensal cadastrado</div><strong id="reportCost">R$ 0,00</strong></div><div class="stat"><div class="label">Projeção anual (12 × mensal)</div><strong id="reportYear">R$ 0,00</strong></div><div class="stat"><div class="label">Contêineres cadastrados</div><strong id="reportTotal">0</strong></div><div class="stat"><div class="label">PDFs anexados</div><strong id="reportPdf">0</strong></div></div><div class="panel" style="margin-top:20px"><h2>Detalhamento de custos</h2><div id="reportTable"></div><p class="small muted">Relatório de simulação de custos.</p></div></section>
+<footer class="footer">CloudBilling Manager</footer></main></div></section>
+<div id="modalOverlay" class="overlay hidden"><form id="containerForm" class="modal"><div class="modal-top"><h2 id="modalTitle">Novo contêiner</h2><button type="button" class="btn" id="closeModal" aria-label="Fechar">✕</button></div><div class="formgrid"><label class="field span2">Nome do contêiner<input name="name" maxlength="80" required placeholder="Ex.: API de Clientes"></label><label class="field">Imagem / tecnologia<input name="image" maxlength="100" placeholder="Ex.: node:22-alpine"></label><label class="field">Status<select name="status"><option value="active">Ativo</option><option value="paused">Pausado</option></select></label><label class="field">CPU (vCPU)<input name="cpu" type="number" min="0.1" max="128" step="0.1" value="1" required></label><label class="field">Memória RAM (GB)<input name="ram" type="number" min="0.1" max="1024" step="0.1" value="2" required></label><label class="field">Armazenamento (GB)<input name="disk" type="number" min="0" max="100000" step="0.1" value="10" required></label><label class="field">Valor mensal (R$)<input name="price" type="number" min="0" max="100000000" step="0.01" value="100" required></label><label class="field span2">Descrição e finalidade<textarea name="description" rows="3" maxlength="2000" placeholder="Descreva a finalidade do contêiner..."></textarea></label><label class="field span2">Documentação PDF (até 10 MB)<input id="pdfInput" type="file" accept="application/pdf,.pdf"><span id="currentPdf" class="muted small"></span></label></div><p class="err" id="formError" role="alert"></p><div class="modal-footer"><button type="button" id="cancelModal" class="btn">Cancelar</button><button id="saveButton" class="btn primary" type="submit">Salvar contêiner</button></div></form></div><div id="toast" class="toast hidden" role="status"></div>
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signOut} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import {getFirestore,collection,doc,getDoc,getDocFromServer,addDoc,updateDoc,deleteDoc,onSnapshot,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {getFirestore,collection,doc,getDocFromServer,addDoc,updateDoc,deleteDoc,onSnapshot,serverTimestamp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 const firebaseConfig={apiKey:"AIzaSyDShBdXuIV7V2DOniYkVn_mlkf1HE5t2oY",authDomain:"cloudservicepayment.firebaseapp.com",projectId:"cloudservicepayment",storageBucket:"cloudservicepayment.firebasestorage.app",messagingSenderId:"682220384965",appId:"1:682220384965:web:d69f3ec14a2656efe776ac",measurementId:"G-MLX9BVMTGJ"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app);
@@ -101,6 +103,41 @@ function readContainer(snapshot){
 }
 function dataWarning(message){$('dataWarning').textContent=message;$('dataWarning').classList.toggle('hidden',!message)}
 
+
+// UI messages describe the next action; diagnostics remain in the browser console.
+function userMessage(error,fallback='Não foi possível concluir a operação. Tente novamente.'){
+  const messages={
+    'auth/invalid-credential':'E-mail ou senha incorretos. Confira os dados e tente novamente.',
+    'auth/invalid-login-credentials':'E-mail ou senha incorretos. Confira os dados e tente novamente.',
+    'auth/user-not-found':'E-mail ou senha incorretos. Confira os dados e tente novamente.',
+    'auth/wrong-password':'E-mail ou senha incorretos. Confira os dados e tente novamente.',
+    'auth/invalid-email':'Informe um e-mail válido.',
+    'auth/user-disabled':'Esta conta está desativada. Entre com outra conta autorizada.',
+    'auth/too-many-requests':'Muitas tentativas de acesso. Aguarde alguns minutos e tente novamente.',
+    'auth/network-request-failed':'Não foi possível conectar. Verifique sua conexão e tente novamente.',
+    'auth/popup-blocked':'Permita a janela de login no navegador e tente novamente.',
+    'auth/popup-closed-by-user':'O login foi cancelado. Tente novamente quando quiser.',
+    'auth/cancelled-popup-request':'Já existe uma tentativa de login em andamento.',
+    'auth/operation-not-allowed':'Esta forma de acesso está indisponível no momento. Tente outra opção.',
+    'auth/unauthorized-domain':'O acesso está indisponível neste endereço. Tente novamente mais tarde.',
+    'auth/account-exists-with-different-credential':'Entre usando a forma de acesso que você já utiliza para esta conta.',
+    'permission-denied':'Sua conta não tem permissão para esta operação.',
+    'storage/unauthorized':'Sua conta não tem permissão para acessar este arquivo.',
+    'storage/unauthenticated':'Sua sessão expirou. Entre novamente.',
+    'storage/object-not-found':'O arquivo não está disponível.',
+    'storage/retry-limit-exceeded':'O envio não foi concluído. Verifique sua conexão e tente novamente.',
+    'unavailable':'O serviço está temporariamente indisponível. Tente novamente.',
+    'not-found':'Este cadastro não está mais disponível. Atualize a página.',
+  };
+  const message=messages[error?.code];
+  return typeof message==='string'?message:fallback;
+}
+function reportError(context,error){console.warn('[CloudBilling] '+context,error?.code||'unknown')}
+function setLoginBusy(busy){
+  $('loginButton').disabled=busy;$('googleLogin').disabled=busy;
+  $('loginButton').textContent=busy?'Verificando acesso…':'Entrar no painel';
+}
+
 function toast(message,error=false){const el=$('toast');el.textContent=message;el.classList.toggle('error',error);el.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),4500)}
 function showApp(yes){$('loginScreen').classList.toggle('hidden',yes);$('appScreen').classList.toggle('hidden',!yes)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
@@ -113,11 +150,58 @@ $('recentTable').innerHTML=table(items.slice(0,5),false);const query=$('search')
 $('reportCost').textContent=money(total);$('reportYear').textContent=money(total*12);$('reportTotal').textContent=items.length;$('reportPdf').textContent=pdf;$('reportTable').innerHTML=table(items,false);
 const now=new Date(),months=Array.from({length:6},(_,i)=>new Date(now.getFullYear(),now.getMonth()+i,1));$('chart').innerHTML=months.map(m=>'<div class="barcol"><span>'+money(total)+'</span><div class="bar" style="height:'+(total>0?'75':'2')+'%"></div><span>'+m.toLocaleDateString('pt-BR',{month:'short'})+'</span></div>').join('');
 }
-async function enter(user){const t=++session;try{const adm=await getDoc(doc(db,'admins',user.uid));if(t!==session)return;if(!adm.exists()){await signOut(auth);$('loginError').textContent='Este usuário não foi autorizado. Cadastre o UID dele em admins no Firestore.';return} $('sidebarEmail').textContent=user.email||'Administrador';showApp(true);unsubscribe=onSnapshot(collection(db,'containers'),snap=>{if(t!==session)return;const parsed=snap.docs.map(readContainer);const invalid=parsed.filter(c=>!c).length;items=parsed.filter(Boolean).sort((a,b)=>b.createdAt.seconds-a.createdAt.seconds);dataWarning(invalid?invalid+' cadastro(s) com dados inválidos foram omitidos. Os totais e relatórios incluem apenas cadastros válidos. Os documentos originais foram preservados.':'');render()},err=>{if(t!==session)return;items=[];render();dataWarning('Não foi possível carregar os cadastros. Os totais estão indisponíveis. Entre novamente para tentar recuperar a conexão.');toast('Erro ao carregar contêineres: '+err.message,true)})}catch(e){$('loginError').textContent='Erro de acesso: '+e.message;toast('Não foi possível verificar permissões.',true)}}
-onAuthStateChanged(auth,user=>{if(unsubscribe){unsubscribe();unsubscribe=null}session++;items=[];dataWarning('');render();showApp(false);$('modalOverlay').classList.add('hidden');editingId=null;pendingPdf=null;$('loginPassword').value='';if(user)enter(user)});
-$('googleLogin').addEventListener('click',async()=>{const button=$('googleLogin');button.disabled=true;$('loginError').textContent='';try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider)}catch(err){if(err.code!=='auth/popup-closed-by-user'){$('loginError').textContent=err.code==='auth/operation-not-allowed'?'Ative o provedor Google em Firebase Authentication.':err.code==='auth/unauthorized-domain'?'Adicione este domínio em Authentication > Settings > Authorized domains.':'Não foi possível entrar com Google: '+err.message}}finally{button.disabled=false}});
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginError').textContent='';$('loginButton').disabled=true;try{await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value)}catch(err){$('loginError').textContent='Falha no login. Verifique as credenciais e o Authentication habilitado.'}finally{$('loginButton').disabled=false}});
-async function logout(){if(uploading){toast('Aguarde o salvamento antes de sair.',true);return}try{await signOut(auth)}catch(err){toast('Não foi possível sair: '+err.message,true)}}$('logoutSide').onclick=logout;$('logoutMobile').onclick=logout;
+async function enter(user){
+  const t=++session;setLoginBusy(true);showApp(false);
+  if(unsubscribe){unsubscribe();unsubscribe=null}
+  try{
+    const adm=await getDocFromServer(doc(db,'admins',user.uid));
+    if(t!==session)return;
+    if(!adm.exists()){
+      showApp(false);
+      try{await signOut(auth)}catch(error){reportError('sign-out-after-access-denied',error)}
+      $('loginError').textContent='Sua conta ainda não tem acesso a este painel. Entre com uma conta autorizada.';
+      return;
+    }
+    $('loginError').textContent='';$('sidebarEmail').textContent=user.email||'Administrador';showApp(true);
+    dataWarning('Carregando seus cadastros…');
+    unsubscribe=onSnapshot(collection(db,'containers'),snap=>{
+      if(t!==session)return;
+      const parsed=snap.docs.map(readContainer),invalid=parsed.filter(c=>!c).length;
+      items=parsed.filter(Boolean).sort((a,b)=>b.createdAt.seconds-a.createdAt.seconds);
+      dataWarning(invalid?invalid+' cadastro(s) precisam de revisão e não foram incluídos nos totais e relatórios.':'');render();
+    },error=>{
+      if(t!==session)return;
+      items=[];render();reportError('load-containers',error);
+      dataWarning('Não foi possível carregar os cadastros. Os totais estão indisponíveis. Entre novamente para tentar recuperar a conexão.');
+      toast(userMessage(error,'Não foi possível carregar os cadastros. Tente novamente.'),true);
+    });
+  }catch(error){
+    if(t!==session)return;
+    showApp(false);reportError('verify-access',error);
+    $('loginError').textContent=userMessage(error,'Não foi possível verificar seu acesso. Tente entrar novamente.');
+  }finally{if(t===session||!auth.currentUser)setLoginBusy(false)}
+}
+onAuthStateChanged(auth,user=>{
+  if(unsubscribe){unsubscribe();unsubscribe=null}
+  session++;items=[];dataWarning('');render();showApp(false);
+  $('modalOverlay').classList.add('hidden');editingId=null;pendingPdf=null;$('loginPassword').value='';
+  if(user)enter(user);else setLoginBusy(false);
+});
+$('googleLogin').addEventListener('click',async()=>{
+  setLoginBusy(true);$('loginError').textContent='';const attemptSession=session;
+  try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});const result=await signInWithPopup(auth,provider);if(attemptSession===session)await enter(result.user)}
+  catch(error){reportError('google-login',error);$('loginError').textContent=userMessage(error,'Não foi possível entrar com Google. Tente novamente.');setLoginBusy(false)}
+});
+$('loginForm').addEventListener('submit',async event=>{
+  event.preventDefault();setLoginBusy(true);$('loginError').textContent='';const attemptSession=session;
+  try{const result=await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPassword').value);if(attemptSession===session)await enter(result.user)}
+  catch(error){reportError('email-login',error);$('loginError').textContent=userMessage(error,'Não foi possível entrar. Confira seus dados e tente novamente.');setLoginBusy(false)}
+});
+async function logout(){
+  if(uploading){toast('Aguarde o salvamento antes de sair.',true);return}
+  try{await signOut(auth)}catch(error){reportError('logout',error);toast(userMessage(error,'Não foi possível sair. Tente novamente.'),true)}
+}
+$('logoutSide').onclick=logout;$('logoutMobile').onclick=logout;
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>page(b.dataset.page)));
 async function closeModal(){
   if(uploading)return;
@@ -132,7 +216,7 @@ async function closeModal(){
         catch(err){if(err.code!=='storage/object-not-found')throw err}
       }
       pendingPdf=null;
-    }catch(err){$('formError').textContent='Não foi possível verificar o PDF. Tente Salvar ou Cancelar novamente quando a conexão voltar. '+err.message;return}
+    }catch(err){reportError('cancel-pdf',err);$('formError').textContent='Não foi possível verificar o PDF. Tente Salvar ou Cancelar novamente quando a conexão voltar.';return}
     finally{uploading=false;$('saveButton').disabled=false}
   }
   $('modalOverlay').classList.add('hidden');editingId=null;
@@ -182,19 +266,20 @@ $('containerForm').addEventListener('submit',async e=>{
       pendingPdf=null;
       if(attachment.previousPath&&attachment.previousPath!==attachment.path){
         try{await deleteObject(ref(storage,attachment.previousPath))}
-        catch(err){if(err.code!=='storage/object-not-found'){cleanupFailed=true;console.warn('PDF anterior não pôde ser removido',err)}}
+        catch(err){if(err.code!=='storage/object-not-found'){cleanupFailed=true;reportError('remove-previous-pdf',err)}}
       }
     }
     if(operationSession!==session)return;
     uploading=false;await closeModal();
-    toast(cleanupFailed?'Cadastro salvo. O PDF anterior não pôde ser removido; é necessário revisar os anexos no Storage.':created?'Contêiner criado com sucesso!':'Contêiner atualizado!',cleanupFailed);
+    toast(cleanupFailed?'Cadastro salvo. Não foi possível remover o anexo anterior.':created?'Contêiner criado com sucesso!':'Contêiner atualizado!',cleanupFailed);
   }catch(err){
     // Never delete an uploaded file after an uncertain metadata-write result.
     const prefix=fieldsSaved?'Os dados do contêiner foram salvos. O PDF não foi concluído. Clique em Salvar para tentar novamente no mesmo cadastro. ':'Não foi possível salvar os dados. ';
-    if(operationSession===session)$('formError').textContent=prefix+err.message;
+    reportError('save-container',err);
+    if(operationSession===session)$('formError').textContent=fieldsSaved?prefix:prefix+userMessage(err,'Tente novamente em instantes.');
   }finally{uploading=false;$('saveButton').disabled=false}
 });
-$('containerTable').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const c=items.find(x=>x.id===b.dataset.id);if(!c)return;try{if(b.dataset.action==='edit')openModal(c);if(b.dataset.action==='pdf'){const url=await getDownloadURL(ref(storage,c.pdfPath));window.open(url,'_blank','noopener,noreferrer');toast('PDF aberto em uma nova aba.')}if(b.dataset.action==='delete'&&confirm('Excluir o contêiner "'+c.name+'" e seu PDF?')){await deleteDoc(doc(db,'containers',c.id));if(c.pdfPath){try{await deleteObject(ref(storage,c.pdfPath))}catch(err){console.warn('Falha na exclusão do PDF',err)}}toast('Contêiner excluído.')}}catch(err){toast('Operação não concluída: '+err.message,true)}});
+$('containerTable').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const c=items.find(x=>x.id===b.dataset.id);if(!c)return;try{if(b.dataset.action==='edit')openModal(c);if(b.dataset.action==='pdf'){const url=await getDownloadURL(ref(storage,c.pdfPath));window.open(url,'_blank','noopener,noreferrer');toast('PDF aberto em uma nova aba.')}if(b.dataset.action==='delete'&&confirm('Excluir o contêiner "'+c.name+'" e seu PDF?')){await deleteDoc(doc(db,'containers',c.id));if(c.pdfPath){try{await deleteObject(ref(storage,c.pdfPath))}catch(err){reportError('delete-pdf',err)}}toast('Contêiner excluído.')}}catch(err){reportError('container-action',err);toast(userMessage(err),true)}});
 $('exportButton').onclick=()=>{const rows=[['Nome','Imagem','Status','CPU','RAM GB','Disco GB','Valor mensal BRL','Descrição','Documento PDF'],...items.map(c=>[c.name,c.image,c.status,c.cpu,c.ram,c.disk,c.price,c.description,c.pdfName||''])];const csv='\uFEFF'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='cloudbilling-relatorio.csv';a.click();URL.revokeObjectURL(url)};
 $('printButton').onclick=()=>window.print();
 </script></body></html>

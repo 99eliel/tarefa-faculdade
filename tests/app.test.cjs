@@ -27,8 +27,9 @@ function setup(options={}){
     onAuthStateChanged:(_,fn)=>{context.authCallback=fn},
     onSnapshot:(_,success,error)=>{context.snapshot=success;context.snapshotError=error;return ()=>{}},
     getDoc:async()=>({exists:()=>true}),
-    getDocFromServer:async id=>{if(options.readFails)throw Error('offline');return {exists:()=>records.has(id),data:()=>records.get(id)}},
+    getDocFromServer:async id=>{if(options.readFails)throw Error('offline');if(id==='admin')return {exists:()=>options.adminExists!==false};return {exists:()=>records.has(id),data:()=>records.get(id)}},
     signOut:async()=>{},
+    GoogleAuthProvider:class{setCustomParameters(){}},
     addDoc:async(_,values)=>{calls.create++;const id='container-'+calls.create;records.set(id,{...values});return {id}},
     updateDoc:async(id,values)=>{
       if(!records.has(id))throw Error('not-found');
@@ -116,7 +117,7 @@ test('replacement cleanup failure reports partial cleanup but preserves new atta
   const h=setup({deleteFails:true});await h.submit();
   const existing={id:'container-1',...h.records.get('container-1'),pdfPath:'old.pdf',pdfName:'old.pdf'};
   h.records.set('container-1',existing);h.context.existing=existing;h.run('items=[existing];openModal(existing)');h.withPdf();await h.submit();
-  assert.notEqual(h.records.get('container-1').pdfPath,'old.pdf');assert.equal(h.objects.size,1);assert.match(h.node('toast').textContent,/anterior não pôde/);
+  assert.notEqual(h.records.get('container-1').pdfPath,'old.pdf');assert.equal(h.objects.size,1);assert.match(h.node('toast').textContent,/Não foi possível remover o anexo anterior/);
 });
 test('double submit while saving does not start another operation',async()=>{
   const h=setup();let release;h.context.addDoc=async(_,values)=>{h.calls.create++;await new Promise(resolve=>release=resolve);h.records.set('one',values);return {id:'one'}};
@@ -125,4 +126,39 @@ test('double submit while saving does not start another operation',async()=>{
 test('render still escapes user-provided HTML',()=>{
   const h=setup();h.run('items=[{id:"a",name:"<img src=x onerror=alert(1)>",image:"node",status:"active",cpu:1,ram:2,disk:10,price:100}];render()');
   assert.ok(h.node('containerTable').innerHTML.includes('&lt;img'));assert.ok(!h.node('containerTable').innerHTML.includes('<img'));
+});
+test('login copy does not contain infrastructure notices',()=>{
+  const login=html.slice(html.indexOf('<section id="loginScreen"'),html.indexOf('<section id="appScreen"'));
+  assert.doesNotMatch(login,/Firebase|Firestore|UID|administradores cadastrados/);
+  assert.match(login,/Continuar com Google/);assert.match(login,/Seu e-mail/);
+});
+test('unknown backend errors never expose raw details to the user',()=>{
+  const h=setup();h.context.failure={code:'unexpected',message:'Firebase secret diagnostic UID Firestore'};
+  assert.doesNotMatch(h.run('userMessage(failure)'),/Firebase|secret|UID|Firestore/);
+  assert.match(h.run('userMessage({code:"auth/popup-blocked"})'),/janela de login/);
+});
+test('Google sign-in errors use readable messages and unlock both login methods',async()=>{
+  for(const code of ['auth/unauthorized-domain','auth/operation-not-allowed','auth/popup-blocked','auth/network-request-failed','auth/popup-closed-by-user','unknown']){
+    const h=setup();h.context.signInWithPopup=async()=>{throw {code,message:'Firebase raw diagnostic'}};
+    await h.node('googleLogin').handlers.click();
+    assert.ok(h.node('loginError').textContent);assert.doesNotMatch(h.node('loginError').textContent,/Firebase|raw|Authentication|Authorized domains/);
+    assert.equal(h.node('googleLogin').disabled,false);assert.equal(h.node('loginButton').disabled,false);
+  }
+});
+test('email login rejects credentials without exposing backend diagnostics',async()=>{
+  const h=setup();h.context.signInWithEmailAndPassword=async()=>{throw {code:'auth/invalid-credential',message:'Firebase raw diagnostic'}};
+  await h.node('loginForm').handlers.submit({preventDefault(){}});
+  assert.match(h.node('loginError').textContent,/E-mail ou senha incorretos/);assert.equal(h.node('loginButton').disabled,false);
+});
+test('Google authentication alone does not grant admin access',async()=>{
+  const h=setup({adminExists:false});h.context.signInWithPopup=async()=>({user:{uid:'admin'}});
+  await h.node('googleLogin').handlers.click();
+  assert.equal(h.node('appScreen').classList.contains('hidden'),true);
+  assert.match(h.node('loginError').textContent,/ainda não tem acesso/);assert.doesNotMatch(h.node('loginError').textContent,/UID|Firestore|admins/);
+});
+test('retry with an already authenticated account verifies access again',async()=>{
+  const h=setup({readFails:true});h.context.signInWithPopup=async()=>({user:{uid:'admin'}});
+  await h.node('googleLogin').handlers.click();assert.match(h.node('loginError').textContent,/verificar seu acesso/);
+  h.options.readFails=false;await h.node('googleLogin').handlers.click();
+  assert.equal(h.node('appScreen').classList.contains('hidden'),false);assert.equal(h.node('loginError').textContent,'');assert.equal(h.node('loginButton').disabled,false);
 });
